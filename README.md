@@ -51,4 +51,5 @@ git push heroku master
 7. Done! You're app should be running!
 
 For help or status, use `heroku logs --tail`.
-To change the number of web dynos, use `heroku ps:scale web=0`.
+To change the number of web dynos, use `heroku ps:scale web=0`. 
+Get this folder at `git clone https://git.heroku.com/ts-tweepy.git`.
