@@ -3,8 +3,7 @@
 An application that collects tweets and extracts malware names every week. 
 
 Link: [https://ts-tweepy.herokuapp.com/](https://ts-tweepy.herokuapp.com/)
-
-
+<hr>
 
 #### Steps: 
 
