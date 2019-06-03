@@ -1,1 +1,1 @@
-web: flask run
+web: flask run; web: gunicorn dashapp:app
