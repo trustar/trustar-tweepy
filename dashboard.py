@@ -16,12 +16,13 @@ import humanize
 import plotly.graph_objs as go
 from plotly.offline import download_plotlyjs, init_notebook_mode, plot, iplot
 import tweepy
-import jsonpickle
 import requests
 
 import matplotlib.pyplot as plt
 import matplotlib as mpl
 import pandas as pd
+
+# from flask.helpers import get_root_path
 
 ###########################################
 # Load data
