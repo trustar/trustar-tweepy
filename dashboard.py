@@ -28,7 +28,7 @@ import os
 # Load data
 ###########################################
 
-all_tweets = pd.read_csv("Collect/tweets.csv")
+all_tweets = pd.read_csv("tweets.csv")
 all_tweets['created'] = all_tweets['created'].apply(lambda date: str(date)[0:10])
 
 data = pd.read_csv("running_avgs.csv")
