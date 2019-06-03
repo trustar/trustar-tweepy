@@ -1,13 +1,18 @@
 import dash
 from flask import Flask
 from flask.helpers import get_root_path
+import os
+
+
+port = int(os.environ.get('PORT'))
+print(port)
 
 
 def create_app():
     server = Flask(__name__)
     register_dashapps(server)
     return server
-
+    
 
 def register_dashapps(app):
     from app.dashapp1.layout import layout
@@ -20,6 +25,7 @@ def register_dashapps(app):
                          server=app,
                          url_base_pathname='/',
                          meta_tags=[meta_viewport],
+                         port=port,
                          external_stylesheets=external_stylesheets)
     
     dashapp1.index_string = '''
