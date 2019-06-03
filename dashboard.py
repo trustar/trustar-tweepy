@@ -28,10 +28,10 @@ import os
 # Load data
 ###########################################
 
-all_tweets = pd.read_csv("app/dashapp1/Collect/tweets.csv")
+all_tweets = pd.read_csv("Collect/tweets.csv")
 all_tweets['created'] = all_tweets['created'].apply(lambda date: str(date)[0:10])
 
-data = pd.read_csv("app/dashapp1/running_avgs.csv")
+data = pd.read_csv("running_avgs.csv")
 options = [{"label": entity, "value": entity} for entity in data.groupby(['flagged']).sum().reset_index()[data.groupby(['flagged']).sum().reset_index()['frequency']>=50].flagged.values]
 
 def everyweek(stop):
@@ -105,7 +105,7 @@ footer{
             	<figure>
             		<hr>
     				<img src="/static/logo.png" height='18'> 
-    				<p style="font-size:7px;"><i><a href="http://vivianamarquez.com/" target="_blank">Вивиана Маркез</a> © 2019</i></p> 
+    				<p style="font-size:7px;"><i>TruSTAR © 2019</i></p> 
     				<br>
     			</figure>
     		</center>
@@ -418,8 +418,6 @@ def get_tweet(malware, date):
 ###########################################
 
 port = int(os.environ.get('PORT',8080))
-print(port)
-print(os.environ.get('HOST'))
 
 if __name__ == '__main__':
    app.run_server(port=port)
