@@ -415,8 +415,9 @@ def get_tweet(malware, date):
 # Main
 ###########################################
 
-port = int(os.environ.get('PORT'))
+port = int(os.environ.get('PORT',8080))
 print(port)
+print(os.environ.get('HOST'))
 
 if __name__ == '__main__':
    app.run_server(port=port)
