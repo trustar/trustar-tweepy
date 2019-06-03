@@ -3,6 +3,7 @@
 An application that collects tweets and extracts malware names every week. 
 
 Link: [https://ts-tweepy.herokuapp.com/](https://ts-tweepy.herokuapp.com/)
+
 <hr>
 
 #### Steps: 
@@ -28,9 +29,11 @@ pip install -r requirements.txt
 4. Create the app
 ```
 heroku create ts-tweepy
+heroku git:remote -a ts-tweepy
 heroku config:set FLASK_APP=dashapp.py
 ```
 The name of the app should be unique across all the users on Heroku.
+You can see your apps using `heroku apps`
 Your app will be deployed at `https://ts-tweepy.herokuapp.com/`.
 
 5. Create a Procfile that calls unicorn with the command
