@@ -33,7 +33,7 @@ heroku git:remote -a ts-tweepy
 heroku config:set FLASK_APP=dashapp.py
 ```
 The name of the app should be unique across all the users on Heroku.
-You can see your apps using `heroku apps`
+You can see your apps using `heroku apps`.
 Your app will be deployed at `https://ts-tweepy.herokuapp.com/`.
 
 5. Create a Procfile that calls unicorn with the command
@@ -48,6 +48,7 @@ The command `dashboard:server` is the same as calling `from dashboard import ser
 git push heroku master
 ```
 
-7. Done! You're app should be running. 
+7. Done! You're app should be running!
+
 For help or status, use `heroku logs --tail`.
-For changing the number of web dynos, use `heroku ps:scale web=0`.
+To change the number of web dynos, use `heroku ps:scale web=0`.
