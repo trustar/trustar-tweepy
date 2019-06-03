@@ -114,6 +114,8 @@ footer{
 </html>
 '''
 
+server = app.server
+
 colors = {
    'background': '#f7fcfe',
    'title': '#0f0e6e',
