@@ -22,7 +22,7 @@ import matplotlib.pyplot as plt
 import matplotlib as mpl
 import pandas as pd
 
-# from flask.helpers import get_root_path
+import os
 
 ###########################################
 # Load data
@@ -415,5 +415,7 @@ def get_tweet(malware, date):
 # Main
 ###########################################
 
+port = int(os.environ.get('PORT', 5000))
+
 if __name__ == '__main__':
-   app.run_server(port=8896)
+   app.run_server(port=port)
