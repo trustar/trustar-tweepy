@@ -48,4 +48,6 @@ The command `dashboard:server` is the same as calling `from dashboard import ser
 git push heroku master
 ```
 
-7. Done! You're app should be running. For help or status, use `heroku logs --tail`.
+7. Done! You're app should be running. 
+For help or status, use `heroku logs --tail`.
+For changing the number of web dynos, use `heroku ps:scale web=0`.
