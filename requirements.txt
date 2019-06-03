@@ -11,6 +11,7 @@ dash-table==3.7.0
 decorator==4.4.0
 Flask==1.0.3
 Flask-Compress==1.4.0
+gunicorn==19.7.1
 humanize==0.5.1
 idna==2.8
 ipython-genutils==0.2.0
