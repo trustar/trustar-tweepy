@@ -1,1 +1,1 @@
-web: python dashboard.py 
+web: gunicorn --bind 0.0.0.0:$PORT dashapp:app
