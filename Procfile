@@ -1,1 +1,1 @@
-web: python dashboard.py $PORT=8896
+web: python dashboard.py $PORT
