@@ -23,15 +23,22 @@ import matplotlib as mpl
 import pandas as pd
 
 import os
+import io
+
+import boto3
 
 ###########################################
 # Load data
 ###########################################
 
-all_tweets = pd.read_csv("tweets.csv")
+s3 = boto3.client('s3')
+obj_tweets = s3.get_object(Bucket='trustar-dashboard-twitter', Key='tweets.csv')
+obj_avgs = s3.get_object(Bucket='trustar-dashboard-twitter', Key='running_avgs.csv')
+
+all_tweets = pd.read_csv(io.BytesIO(obj_tweets['Body'].read()))
 all_tweets['created'] = all_tweets['created'].apply(lambda date: str(date)[0:10])
 
-data = pd.read_csv("running_avgs.csv")
+data = pd.read_csv(io.BytesIO(obj_avgs['Body'].read()))
 options = [{"label": entity, "value": entity} for entity in data.groupby(['flagged']).sum().reset_index()[data.groupby(['flagged']).sum().reset_index()['frequency']>=50].flagged.values]
 
 def everyweek(stop):
