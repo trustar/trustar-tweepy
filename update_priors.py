@@ -151,17 +151,17 @@ priors = pd.read_csv(io.BytesIO(obj_avgs['Body'].read()))
 last_day = priors.date.max()
 last_day_fixed = last_day.replace("-0","-")
 
-obj_tweets = s3.get_object(Bucket='trustar-dashboard-twitter', Key='tweets.csv')
-df = pd.read_csv(io.BytesIO(obj_tweets['Body'].read()))
+# obj_tweets = s3.get_object(Bucket='trustar-dashboard-twitter', Key='tweets.csv')
+# df = pd.read_csv(io.BytesIO(obj_tweets['Body'].read()))
 
 bucket = s3_resource.Bucket("trustar-twitter")
 files = [f for f in list(bucket.objects.filter(Prefix='output/')) if f.key > f"output/output-{last_day_fixed}"]
-new_tweets = tweets_df(files)
+df = tweets_df(files)
 
-df = pd.concat([df,new_tweets]).drop_duplicates(subset=['id']).reset_index()
-csv_buffer = StringIO()
-df.to_csv(csv_buffer)
-s3_resource.Bucket('trustar-dashboard-twitter').Object("tweets.csv").put(Body=csv_buffer.getvalue())
+# df = pd.concat([df,new_tweets]).drop_duplicates(subset=['id']).reset_index()
+# csv_buffer = StringIO()
+# df.to_csv(csv_buffer)
+# s3_resource.Bucket('trustar-dashboard-twitter').Object("tweets.csv").put(Body=csv_buffer.getvalue())
 
 df['created']=df['created'].apply(lambda tweet: tweet[:10])
 
