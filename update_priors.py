@@ -2,30 +2,13 @@
 # Load Libraries
 ##############################################
 
-import pandas as pd
-from sklearn.externals import joblib
-import boto3
 import io
+import json
+import boto3
+import dateutil.parser
+import pandas as pd
 from io import StringIO
-
-
-##############################################
-# Load Data
-##############################################
-
-s3 = boto3.client('s3')
-
-obj_tweets = s3.get_object(Bucket='trustar-dashboard-twitter', Key='tweets.csv')
-obj_avgs = s3.get_object(Bucket='trustar-dashboard-twitter', Key='running_avgs.csv')
-
-df = pd.read_csv(io.BytesIO(obj_tweets['Body'].read()))
-
-df['created']=df['created'].apply(lambda tweet: tweet[:10])
-
-tweet_dates = sorted(df.created.unique())
-
-priors = pd.read_csv(io.BytesIO(obj_avgs['Body'].read()))
-last_day = priors.date.max()
+from sklearn.externals import joblib
 
 
 ##############################################
@@ -118,12 +101,78 @@ def running_avg(df_prior, df_current, flagged):
     else:
         return sum(df_current.predicted * df_current.frequency) * 1.0 / sum(df_current.frequency)
         
-        
+
+def tweets_list(json_buffer):
+    '''
+    Read a json file and extract relevant tweet information
+    '''
+    tweets_list = []
+    for line in json_buffer.split("\n"):
+        try:
+            tweet = json.loads(line)
+            tweet_dictionary = {}
+            tweet_dictionary['id'] = tweet["id"]
+            tweet_dictionary['text'] = tweet["full_text"]
+            tweet_dictionary['created'] = dateutil.parser.parse(tweet["created_at"])
+            tweet_dictionary['language'] = tweet["lang"]
+            tweets_list.append(tweet_dictionary)
+        except:
+            continue
+    return tweets_list
+    
+    
+def tweets_df(files):
+    """
+    :param files: list of files in s3 bucket directory
+    :return: dataframe of tweets
+    """
+    tweets = []
+    for file in files:
+        obj = file.get()
+        temp = tweets_list(obj['Body'].read().decode('utf-8'))
+        tweets += temp
+    tweets = pd.DataFrame(tweets)
+    tweets = tweets[tweets['language']=="en"]
+    tweets = tweets.drop(['language'], axis=1)
+    tweets = tweets.drop_duplicates(subset=['id'])
+    return tweets
+
+
+
+##############################################
+# Load Data
+##############################################
+
+s3 = boto3.client('s3')
+s3_resource = boto3.resource('s3')
+
+obj_avgs = s3.get_object(Bucket='trustar-dashboard-twitter', Key='running_avgs.csv')
+priors = pd.read_csv(io.BytesIO(obj_avgs['Body'].read()))
+last_day = priors.date.max()
+last_day_fixed = last_day.replace("-0","-")
+
+obj_tweets = s3.get_object(Bucket='trustar-dashboard-twitter', Key='tweets.csv')
+df = pd.read_csv(io.BytesIO(obj_tweets['Body'].read()))
+
+bucket = s3_resource.Bucket("trustar-twitter")
+files = [f for f in list(bucket.objects.filter(Prefix='output/')) if f.key > f"output/output-{last_day_fixed}"]
+new_tweets = tweets_df(files)
+
+df = pd.concat([df,new_tweets]).drop_duplicates(subset=['id']).reset_index()
+csv_buffer = StringIO()
+df.to_csv(csv_buffer)
+s3_resource.Bucket('trustar-dashboard-twitter').Object("tweets.csv").put(Body=csv_buffer.getvalue())
+
+df['created']=df['created'].apply(lambda tweet: tweet[:10])
+
+tweet_dates = sorted(df.created.unique())
+
+
 ##############################################
 # Process
 ##############################################
 
-for day in tweet_dates[tweet_dates.index(last_day)+1:-2]:
+for day in tweet_dates[tweet_dates.index(last_day)+1:-1]:
     obj_avgs = s3.get_object(Bucket='trustar-dashboard-twitter', Key='running_avgs.csv')
     priors = pd.read_csv(io.BytesIO(obj_avgs['Body'].read()))
     df_day = df[df['created']==day]
@@ -141,6 +190,5 @@ for day in tweet_dates[tweet_dates.index(last_day)+1:-2]:
     new_df = pd.concat([priors,df_day])
     csv_buffer = StringIO()
     new_df.to_csv(csv_buffer)
-    s3_resource = boto3.resource('s3')
     s3_resource.Bucket('trustar-dashboard-twitter').Object("running_avgs.csv").put(Body=csv_buffer.getvalue())
     print(f"{day} done!")
