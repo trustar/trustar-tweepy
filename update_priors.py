@@ -46,7 +46,7 @@ def process_text(data):
 
 
 from nltk.corpus import wordnet
-#import enchant
+import enchant
 d = enchant.Dict("en_US")
 obj_tech = s3.get_object(Bucket='trustar-dashboard-twitter', Key='tech.csv')
 tech_file = pd.read_csv(io.BytesIO(obj_tech['Body'].read()), header=None)
