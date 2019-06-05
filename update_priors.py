@@ -10,6 +10,9 @@ import pandas as pd
 from io import StringIO
 from sklearn.externals import joblib
 
+s3 = boto3.client('s3')
+s3_resource = boto3.resource('s3')
+
 
 ##############################################
 # Helper Functions
@@ -142,9 +145,6 @@ def tweets_df(files):
 ##############################################
 # Load Data
 ##############################################
-
-s3 = boto3.client('s3')
-s3_resource = boto3.resource('s3')
 
 obj_avgs = s3.get_object(Bucket='trustar-dashboard-twitter', Key='running_avgs.csv')
 priors = pd.read_csv(io.BytesIO(obj_avgs['Body'].read()))
