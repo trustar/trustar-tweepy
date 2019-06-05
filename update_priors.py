@@ -46,8 +46,8 @@ def process_text(data):
 
 
 from nltk.corpus import wordnet
-import enchant
-d = enchant.Dict("en_US")
+# import enchant
+# d = enchant.Dict("en_US")
 obj_tech = s3.get_object(Bucket='trustar-dashboard-twitter', Key='tech.csv')
 tech_file = pd.read_csv(io.BytesIO(obj_tech['Body'].read()), header=None)
 def flagged_words(data):
@@ -56,10 +56,10 @@ def flagged_words(data):
     Given a list of words, return possible Malware names.
     '''
     possible = list(set(data))
-    possible = [word for word in possible if word.lower() not in tech_file[0].values]
-    possible = [word for word in possible if (len(word)>3 and not(d.check(word.lower())))] 
+    possible = [word for word in possible if (not word.islower() and not word.isupper() and len(word)>3)] # Keep CamelCase words
+    # possible = [word for word in possible if not(d.check(word.lower()))]
+    possible = [word for word in possible if word.lower() not in tech_file[0].values] 
     possible = [word for word in possible if len(wordnet.synsets(word))==0]
-    possible = [word for word in possible if (not word.islower() and not word.isupper())] # Keep CamelCase words
     return possible
 
 
