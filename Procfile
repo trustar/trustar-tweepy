@@ -1,1 +1,1 @@
-web: python update_priors.py; gunicorn dashboard:server
+web: gunicorn dashboard:server

@@ -14,6 +14,7 @@ from io import StringIO
 ##############################################
 
 s3 = boto3.client('s3')
+
 obj_tweets = s3.get_object(Bucket='trustar-dashboard-twitter', Key='tweets.csv')
 obj_avgs = s3.get_object(Bucket='trustar-dashboard-twitter', Key='running_avgs.csv')
 
@@ -47,8 +48,8 @@ def process_text(data):
 from nltk.corpus import wordnet
 import enchant
 d = enchant.Dict("en_US")
-obj_tech = s3.get_object(Bucket='trustar-dashboard-twitter', Key='tweets.csv')
-tech_file = pd.read_csv(io.BytesIO(obj_tech['Body'].read()))
+obj_tech = s3.get_object(Bucket='trustar-dashboard-twitter', Key='tech.csv')
+tech_file = pd.read_csv(io.BytesIO(obj_tech['Body'].read()), header=None)
 def flagged_words(data):
     '''
     input: Processed tweet
@@ -91,7 +92,9 @@ def get_context_df(df):
 obj_malware = s3.get_object(Bucket='trustar-dashboard-twitter', Key='known_malware.csv')
 malware_file = pd.read_csv(io.BytesIO(obj_malware['Body'].read()), header=None)
 malware_file[0] = malware_file[0].apply(lambda m: m.lower())
-model = joblib.load("model.pkl")
+
+obj_model = s3.get_object(Bucket='trustar-dashboard-twitter', Key='model.pkl')
+model = joblib.load(io.BytesIO(obj_model['Body'].read()))
 def get_prediction(df):
     predictions = []
     for row in df.iterrows():
@@ -121,6 +124,7 @@ def running_avg(df_prior, df_current, flagged):
 ##############################################
 
 for day in tweet_dates[tweet_dates.index(last_day)+1:-2]:
+    obj_avgs = s3.get_object(Bucket='trustar-dashboard-twitter', Key='running_avgs.csv')
     priors = pd.read_csv(io.BytesIO(obj_avgs['Body'].read()))
     df_day = df[df['created']==day]
     df_day['processed'] = df_day['text'].apply(lambda tweet: process_text(tweet))
