@@ -103,43 +103,6 @@ def running_avg(df_prior, df_current, flagged):
         return sum(df.predicted * df.frequency) * 1.0 / sum(df.frequency)
     else:
         return sum(df_current.predicted * df_current.frequency) * 1.0 / sum(df_current.frequency)
-        
-
-def tweets_list(json_buffer):
-    '''
-    Read a json file and extract relevant tweet information
-    '''
-    tweets_list = []
-    for line in json_buffer.split("\n"):
-        try:
-            tweet = json.loads(line)
-            tweet_dictionary = {}
-            tweet_dictionary['id'] = tweet["id"]
-            tweet_dictionary['text'] = tweet["full_text"]
-            tweet_dictionary['created'] = dateutil.parser.parse(tweet["created_at"])
-            tweet_dictionary['language'] = tweet["lang"]
-            tweets_list.append(tweet_dictionary)
-        except:
-            continue
-    return tweets_list
-    
-    
-def tweets_df(files):
-    """
-    :param files: list of files in s3 bucket directory
-    :return: dataframe of tweets
-    """
-    tweets = []
-    for file in files:
-        obj = file.get()
-        temp = tweets_list(obj['Body'].read().decode('utf-8'))
-        tweets += temp
-    tweets = pd.DataFrame(tweets)
-    tweets = tweets[tweets['language']=="en"]
-    tweets = tweets.drop(['language'], axis=1)
-    tweets = tweets.drop_duplicates(subset=['id'])
-    return tweets
-
 
 
 ##############################################
@@ -151,22 +114,12 @@ priors = pd.read_csv(io.BytesIO(obj_avgs['Body'].read()))
 last_day = priors.date.max()
 last_day_fixed = last_day.replace("-0","-")
 
-# obj_tweets = s3.get_object(Bucket='trustar-dashboard-twitter', Key='tweets.csv')
-# df = pd.read_csv(io.BytesIO(obj_tweets['Body'].read()))
-
-bucket = s3_resource.Bucket("trustar-twitter")
-files = [f for f in list(bucket.objects.filter(Prefix='output/')) if f.key > f"output/output-{last_day_fixed}"]
-df = tweets_df(files)
-
-# df = pd.concat([df,new_tweets]).drop_duplicates(subset=['id']).reset_index()
-# csv_buffer = StringIO()
-# df.to_csv(csv_buffer)
-# s3_resource.Bucket('trustar-dashboard-twitter').Object("tweets.csv").put(Body=csv_buffer.getvalue())
+obj_tweets = s3.get_object(Bucket='trustar-dashboard-twitter', Key='tweets.csv')
+df = pd.read_csv(io.BytesIO(obj_tweets['Body'].read()))
 
 df['created']=df['created'].apply(lambda tweet: tweet[:10])
 
 tweet_dates = sorted(df.created.unique())
-
 
 
 ##############################################
