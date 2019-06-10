@@ -32,10 +32,12 @@ def process_text(data):
 
 
 from nltk.corpus import wordnet
+from nltk.corpus import stopwords
 # import enchant
 # d = enchant.Dict("en_US")
 obj_tech = s3.get_object(Bucket='trustar-dashboard-twitter', Key='tech.csv')
 tech_file = pd.read_csv(io.BytesIO(obj_tech['Body'].read()), header=None)
+stop_words = set(stopwords.words('english'))
 def flagged_words(data):
     '''
     input: Processed tweet
@@ -43,9 +45,11 @@ def flagged_words(data):
     '''
     possible = list(set(data))
     possible = [word for word in possible if (not word.islower() and not word.isupper() and len(word)>3)] # Keep CamelCase words
+    possible = [word for word in possible if word.lower() not in stop_words]
     # possible = [word for word in possible if not(d.check(word.lower()))]
     possible = [word for word in possible if word.lower() not in tech_file[0].values] 
     possible = [word for word in possible if len(wordnet.synsets(word))==0]
+    possible = [word for word in possible if not word.isdigit()]  # Remove numbers
     return possible
 
 
