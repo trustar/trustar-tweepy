@@ -147,6 +147,6 @@ for day in tweet_dates[tweet_dates.index(last_day)+1:-1]:
     
     new_df = pd.concat([priors,df_day])
     csv_buffer = StringIO()
-    new_df.to_csv(csv_buffer)
+    new_df.to_csv(csv_buffer, index=False)
     s3_resource.Bucket('trustar-dashboard-twitter').Object("running_avgs.csv").put(Body=csv_buffer.getvalue())
     print(f"{day} done!")
